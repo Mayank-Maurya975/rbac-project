@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nimbus RBAC Demo - HTML Edition</title>
+    <title>Nimbus RBAC Demo - Upgraded UI</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Configure a custom font and ensure dark mode is off -->
@@ -22,6 +22,90 @@
     </script>
     <!-- Use a simple font import -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Add a subtle transition for dark mode */
+        body, .dark body {
+            transition-property: background-color, color;
+            transition-duration: 200ms;
+            transition-timing-function: ease-in-out;
+        }
+        
+        /* Keyframes for the "live" pulse effect on the auth icon */
+        @keyframes pulse-slow {
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* --- Styles for 3D/Modern Auth Box --- */
+
+        .auth-card {
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+            transform: rotateX(0deg); /* Initial state */
+        }
+        .auth-card:hover {
+            transform: translateY(-8px) rotateX(3deg);
+            box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.2), 0 10px 15px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-card-bg {
+            /* Light mode: faint grid */
+            background-color: #ffffff;
+            background-image: linear-gradient(rgba(200, 200, 200, 0.07) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(200, 200, 200, 0.07) 1px, transparent 1px);
+            background-size: 20px 20px;
+            border: 1px solid #f3f4f6; /* border-gray-100 */
+        }
+
+        .dark .auth-card-bg {
+            /* Dark mode: faint grid */
+            background-color: #1f2937; /* bg-gray-800 */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 25px 25px;
+            border: 1px solid #374151; /* border-gray-700 */
+        }
+
+        .auth-input {
+            transition: all 0.2s ease-in-out;
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .dark .auth-input {
+            background-color: #374151; /* dark:bg-gray-700 */
+        }
+        .auth-input:focus {
+            transform: scale(1.01);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+            background-color: #ffffff;
+        }
+        .dark .auth-input:focus {
+            background-color: #4b5563; /* dark:bg-gray-600 */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .auth-button-3d {
+            background-color: #2563eb; /* bg-blue-600 */
+            border-bottom: 4px solid #1d4ed8; /* Darker blue */
+            transition: all 0.15s ease-out;
+        }
+        .auth-button-3d:hover {
+            transform: scale(1.03);
+            background-color: #1d4ed8; /* hover:bg-blue-700 */
+            brightness: 1.1;
+        }
+        .auth-button-3d:active {
+            transform: scale(0.98) translateY(2px);
+            border-bottom-width: 2px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            brightness: 0.9;
+        }
+
+    </style>
 </head>
 <body class="font-sans bg-gray-50 min-h-screen dark:bg-gray-900">
     <!-- Main App Container -->
@@ -33,7 +117,7 @@
     </div>
 
     <script type="module">
-        // Import Lucide-like icons as inline SVG strings
+        // --- Import Lucide-like icons as inline SVG strings ---
         const ICONS = {
             LogIn: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>',
             User: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
@@ -46,6 +130,13 @@
             // Icons for Theme Toggle
             Sun: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
             Moon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+            // New UI Icons
+            LayoutDashboard: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
+            ShieldCheck: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+            MessageSquare: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+            AlertCircle: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+            Info: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+            Close: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
         };
 
         const API_BASE_URL = 'http://localhost:3001/api';
@@ -54,8 +145,8 @@
         // --- Global State ---
         let user = null;
         let posts = [];
-        let currentView = 'dashboard';
-        let isLoading = false;
+        let currentView = 'dashboard'; // 'dashboard', 'admin', 'auth', 'register'
+        let isLoading = true; // Start as true for initial load
         let authMessage = ''; // Used for login/register errors
         let generalMessage = ''; // Used for dashboard/admin messages
         let currentTheme = 'light'; // State for theme
@@ -65,12 +156,12 @@
             ADMIN: {
                 'users': ['create', 'read', 'update', 'delete'],
                 'posts': ['create', 'read', 'update', 'delete'],
-                'admin': ['manage_roles']
+                'admin': ['manage_roles'] // Specific permission for admin panel
             },
             EDITOR: {
                 'posts': ['create', 'read'],
                 'self_posts': ['update', 'delete'], // Can update/delete only their own posts
-                'users': ['read']
+                'users': ['read'] // Can read user list (e.g., for author names)
             },
             VIEWER: {
                 'posts': ['read']
@@ -112,22 +203,41 @@
             if (storedUser) {
                 user = JSON.parse(storedUser);
             }
+            isLoading = false; // User checked
         }
 
         function login(userData) {
             user = userData;
             localStorage.setItem('rbacUser', JSON.stringify(userData));
             authMessage = '';
+            currentView = 'dashboard';
             initApp();
         }
 
         function logout() {
             user = null;
             localStorage.removeItem('rbacUser');
-            currentView = 'dashboard';
+            currentView = 'auth';
+            generalMessage = '';
+            posts = [];
             initApp();
         }
         
+        function setCurrentView(view, isRegister = false) {
+            if (view === 'auth') {
+                currentView = isRegister ? 'register' : 'auth';
+            } else {
+                currentView = view;
+            }
+            generalMessage = ''; // Clear messages on navigation
+            renderApp();
+        }
+        
+        function clearGeneralMessage() {
+            generalMessage = '';
+            renderApp();
+        }
+
         // --- Theme Functions ---
         function applyTheme(theme) {
             if (theme === 'dark') {
@@ -150,13 +260,50 @@
             if (savedTheme) {
                 applyTheme(savedTheme);
             } else {
-                // Default to system preference if no theme is saved
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 applyTheme(prefersDark ? 'dark' : 'light');
             }
         }
 
-        // --- View Renderers ---
+        // --- Main App Renderer ---
+
+        function renderApp() {
+            if (isLoading) {
+                renderSpinner();
+                return;
+            }
+
+            if (!user) {
+                // Auth view is full-screen, it doesn't need the header
+                APP_ROOT.innerHTML = `
+                    <main class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="perspective: 1000px;">
+                        ${renderAuthView(currentView === 'register')}
+                    </main>
+                `;
+            } else {
+                // Logged-in view has header + content
+                let mainContent = '';
+                switch (currentView) {
+                    case 'dashboard':
+                        mainContent = renderDashboard();
+                        break;
+                    case 'admin':
+                        mainContent = renderAdminPanel();
+                        break;
+                    default:
+                        currentView = 'dashboard';
+                        mainContent = renderDashboard();
+                }
+
+                APP_ROOT.innerHTML = `
+                    ${renderHeader()}
+                    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        ${renderGlobalMessage()}
+                        ${mainContent}
+                    </main>
+                `;
+            }
+        }
 
         function renderSpinner() {
             APP_ROOT.innerHTML = `
@@ -168,33 +315,48 @@
 
         function renderHeader() {
             const navItems = [
-                { name: 'Dashboard', view: 'dashboard', requiresAuth: true, show: true },
-                { name: 'Admin Panel', view: 'admin', requiresAuth: true, show: user && can('users', 'read') },
+                { name: 'Dashboard', view: 'dashboard', icon: ICONS.LayoutDashboard, show: user && can('posts', 'read') },
+                { name: 'Admin Panel', view: 'admin', icon: ICONS.ShieldCheck, show: user && can('admin', 'manage_roles') },
             ];
 
-            const navHtml = navItems.filter(i => i.show !== false).map(item => `
+            const navHtml = navItems.filter(i => i.show).map(item => `
                 <button
                     onclick="setCurrentView('${item.view}')"
-                    class="px-4 py-2 text-md font-bold rounded-xl transition duration-150 shadow-md ${
+                    class="flex items-center px-4 py-2 text-md font-bold rounded-xl transition-all duration-150 shadow-md ${
                         currentView === item.view
-                            ? 'bg-blue-600 text-white shadow-blue-300'
-                            : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
+                            ? 'bg-blue-600 text-white shadow-blue-300 dark:shadow-blue-800 active:scale-95'
+                            : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white active:scale-95 active:bg-blue-100 dark:active:bg-gray-600'
                     }"
                 >
+                    <span class="w-5 h-5 mr-2">${item.icon}</span>
                     ${item.name}
                 </button>
             `).join('');
 
+            const themeIcon = currentTheme === 'light' ? ICONS.Moon : ICONS.Sun;
+
             const authSection = user ? `
-                <div class="flex items-center space-x-4">
-                    <div class="px-4 py-2 text-sm font-bold rounded-full border shadow-sm ${ROLE_COLORS[user.role]}">
-                        Role: ${user.role}
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-sm font-bold text-gray-900 dark:text-white">${user.username}</div>
+                        <div class="text-xs font-medium px-2 py-0.5 rounded-full inline-block ${ROLE_COLORS[user.role]} border-0 shadow-none">
+                            ${user.role}
+                        </div>
                     </div>
                     <button
-                        onclick="logout()"
-                        class="py-2 px-4 border border-transparent rounded-xl text-md font-bold text-white bg-red-600 hover:bg-red-700 transition shadow-lg shadow-red-300"
+                        onclick="toggleTheme()"
+                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition"
+                        title="Toggle light/dark mode"
                     >
-                        <span class="w-4 h-4 inline-block align-middle mr-1">${ICONS.LogIn}</span> Logout
+                        <span class="w-5 h-5 sm:w-6 sm:h-6">${themeIcon}</span>
+                    </button>
+                    <button
+                        onclick="logout()"
+                        class="py-2 px-3 sm:px-4 border border-transparent rounded-xl text-md font-bold text-white bg-red-600 hover:bg-red-700 transition-all duration-150 shadow-lg shadow-red-200 dark:shadow-red-800/50 flex items-center active:scale-95 active:bg-red-800"
+                        title="Logout"
+                    >
+                        <span class="w-5 h-5">${ICONS.LogIn}</span>
+                        <span class="hidden sm:inline ml-2">Logout</span>
                     </button>
                 </div>
             ` : `
@@ -205,11 +367,11 @@
                 <header class="bg-white shadow-lg sticky top-0 z-10 border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div class="flex justify-between items-center h-20">
-                            <div class="flex-shrink-0 text-3xl font-extrabold text-blue-700 dark:text-blue-400">
-                                Nimbus <span class='text-gray-500 dark:text-gray-400'>RBAC Demo</span>
+                            <div class="flex-shrink-0 text-2xl sm:text-3xl font-extrabold text-blue-700 dark:text-blue-400">
+                                Nimbus <span class='text-gray-500 dark:text-gray-400'>RBAC</span>
                             </div>
-                            <nav class="flex items-center space-x-6">
-                                ${user ? navHtml : ''}
+                            <nav class="flex items-center space-x-2 sm:space-x-4">
+                                ${navHtml}
                             </nav>
                             ${authSection}
                         </div>
@@ -217,35 +379,83 @@
                 </header>
             `;
         }
+        
+        /** Renders a global message box for success, error, or info */
+        function renderGlobalMessage() {
+            if (!generalMessage) return '';
+            
+            const isError = generalMessage.startsWith('❌');
+            const isSuccess = generalMessage.startsWith('✅');
+            let icon = ICONS.Info;
+            let title = 'Info';
+            let colors = 'bg-blue-100 border-blue-300 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700';
 
+            if (isError) {
+                icon = ICONS.AlertCircle;
+                title = 'Error';
+                colors = 'bg-red-100 border-red-300 text-red-800 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700';
+            } else if (isSuccess) {
+                icon = ICONS.ShieldCheck;
+                title = 'Success';
+                colors = 'bg-green-100 border-green-300 text-green-800 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700';
+            }
+            
+            // Remove emoji prefix
+            const messageText = generalMessage.substring(generalMessage.indexOf(' ') + 1);
+            
+            return `
+                <div class="mb-6 p-4 rounded-xl border shadow-md flex items-start ${colors}">
+                    <span class="w-6 h-6 mr-3 shrink-0 mt-0.5">${icon}</span>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg">${title}</h3>
+                        <p class="text-sm">${messageText}</p>
+                    </div>
+                    <button onclick="clearGeneralMessage()" class="ml-4 p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10" title="Dismiss">
+                        <span class="w-5 h-5">${ICONS.Close}</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        /** Renders the User Card for the sidebar */
         function renderUserCard() {
             if (!user) return '';
 
             return `
-                <div class="p-5 rounded-xl shadow-lg mt-8 mb-8 flex items-center justify-between border ${ROLE_COLORS[user.role]}">
-                    <div class='flex items-center'>
-                        <span class='w-6 h-6 mr-3'>${ICONS.User}</span>
+                <div class="p-6 rounded-2xl shadow-xl border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 transition-all duration-300 ease-in-out">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                            <span class='w-8 h-8'>${ICONS.User}</span>
+                        </div>
                         <div>
-                            <h3 class="font-semibold text-2xl">
-                                Welcome, ${user.username}
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                ${user.username}
                             </h3>
-                            <p class="text-sm font-medium opacity-80">
-                                Role: <strong>${user.role}</strong> | User ID: ${user.userId}
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                User ID: ${user.userId}
                             </p>
                         </div>
                     </div>
-                    <div class='text-xs font-mono opacity-80'>
-                        TOKEN: ${user.token.substring(0, 10)}...
+                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Your Role:</p>
+                        <div class="px-4 py-2 text-md font-bold rounded-xl border text-center ${ROLE_COLORS[user.role]}">
+                            ${user.role}
+                        </div>
+                    </div>
+                    <div class="mt-3 text-xs font-mono text-gray-400 dark:text-gray-500 truncate" title="Token: ${user.token}">
+                        TOKEN: ${user.token.substring(0, 20)}...
                     </div>
                 </div>
             `;
         }
 
+        // --- Auth View & Logic ---
+
         function renderAuthView(isRegister = false) {
             const themeIcon = currentTheme === 'light' ? ICONS.Moon : ICONS.Sun;
 
-            let viewHtml = `
-                <div class="max-w-xl mx-auto p-10 mt-10 bg-white shadow-2xl rounded-3xl border border-gray-100 text-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 relative">
+            return `
+                <div class="auth-card auth-card-bg max-w-lg w-full mx-auto p-8 sm:p-10 rounded-3xl shadow-2xl text-gray-800 dark:text-gray-200 relative">
                     
                     <!-- Theme Toggle Button -->
                     <button
@@ -257,28 +467,31 @@
                     </button>
 
                     <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-6 text-center">
-                        <span class='w-8 h-8 inline-block mr-2 text-blue-600 dark:text-blue-400 align-text-top'>${ICONS.LogIn}</span> ${isRegister ? 'New Account Registration' : 'Sign In'}
+                        <span class='w-8 h-8 inline-block mr-2 text-blue-600 dark:text-blue-400 align-text-top animate-pulse-slow'>${ICONS.Shield}</span> ${isRegister ? 'Create Account' : 'Sign In'}
                     </h2>
                     <p class="text-sm text-center mb-8 text-gray-600 bg-gray-50 p-3 rounded-xl border border-dashed dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
-                        <strong>Test Credentials:</strong> <span class='font-mono font-bold text-gray-700 dark:text-gray-300'>admin/admin123</span>, <span class='font-mono font-bold text-gray-700 dark:text-gray-300'>editor1/editor123</span>, <span class='font-mono font-bold text-gray-700 dark:text-gray-300'>viewer/viewer123</span>.
+                        <strong>Test Credentials:</strong> <br>
+                        <span class='font-mono font-bold text-gray-700 dark:text-gray-300'>admin / admin123</span> <br>
+                        <span class='font-mono font-bold text-gray-700 dark:text-gray-300'>editor1 / editor123</span> <br>
+                        <span class='font-mono font-bold text-gray-700 dark:text-gray-300'>viewer / viewer123</span>
                     </p>
                     <form id="authForm" onsubmit="handleAuthSubmit(event, ${isRegister})">
                         <div class="space-y-6">
                             <div>
                                 <input id="username" type="text" placeholder="Username" required
-                                    class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 placeholder:text-gray-400 text-gray-800 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder:text-gray-500"
+                                    class="auth-input w-full px-5 py-3 border border-gray-300 rounded-xl placeholder:text-gray-400 text-gray-800 dark:text-white dark:border-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 >
                             </div>
                             <div>
                                 <input id="password" type="password" placeholder="Password" required
-                                    class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 placeholder:text-gray-400 text-gray-800 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder:text-gray-500"
+                                    class="auth-input w-full px-5 py-3 border border-gray-300 rounded-xl placeholder:text-gray-400 text-gray-800 dark:text-white dark:border-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 >
                             </div>
 
                             ${authMessage ? `<p class="text-red-500 text-sm p-3 bg-red-50 rounded-lg border border-red-200 dark:bg-red-900/50 dark:text-red-400 dark:border-red-700">${authMessage}</p>` : ''}
 
                             <button type="submit" id="authButton"
-                                class="w-full flex justify-center py-3 px-4 rounded-xl shadow-lg text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150"
+                                class="auth-button-3d w-full flex justify-center py-3 px-4 rounded-xl shadow-lg text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-blue-200 dark:shadow-blue-800/50"
                             >
                                 ${isRegister ? 'Register Account' : 'Login'}
                             </button>
@@ -294,7 +507,6 @@
                     </div>
                 </div>
             `;
-            document.getElementById('main-content').innerHTML = viewHtml;
         }
 
         async function handleAuthSubmit(e, isRegister) {
@@ -328,7 +540,8 @@
                 authMessage = err.message;
                 renderApp(); // Re-render with error message
             } finally {
-                if (document.getElementById('authButton')) { // Ensure button still exists
+                // Button may not exist if login was successful
+                if (document.getElementById('authButton')) { 
                     button.disabled = false;
                     button.innerHTML = isRegister ? 'Register Account' : 'Login';
                 }
@@ -337,11 +550,109 @@
 
         // --- Dashboard & Post Logic ---
 
-        function renderPostForm() {
-            if (!user || !can('posts', 'create')) return '';
+        function renderDashboard() {
+            let postsListHtml = '';
+
+            if (!can('posts', 'read')) {
+                postsListHtml = `
+                    <div class="text-red-700 p-6 bg-red-100 rounded-xl border border-red-300 shadow-md dark:bg-red-900/50 dark:text-red-300 dark:border-red-700 flex items-center space-x-4 transition-all duration-300 ease-in-out">
+                        <span class="w-8 h-8">${ICONS.AlertCircle}</span>
+                        <div>
+                            <h3 class="font-bold text-lg">Permission Denied</h3>
+                            <p>Your role (<strong>${user.role}</strong>) does not have permission to 'read' posts.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                if (isLoading) {
+                    postsListHtml = `
+                        <div class="p-6 rounded-2xl shadow-lg bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto mb-3"></div>
+                            Loading posts...
+                        </div>
+                    `;
+                } else if (posts.length === 0) {
+                    postsListHtml = `
+                        <div class="p-10 rounded-2xl shadow-lg bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 border-dashed transition-all duration-300 ease-in-out">
+                            <span class="w-10 h-10 mx-auto text-gray-400">${ICONS.MessageSquare}</span>
+                            <h3 class="mt-2 text-xl font-semibold text-gray-900 dark:text-white">No posts yet</h3>
+                            <p class="mt-1 text-sm">
+                                ${can('posts', 'create') ? "Why don't you create one?" : "Content will appear here when it's published."}
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    postsListHtml = posts.map(renderPostItem).join('');
+                }
+            }
 
             return `
-                <div class="p-8 bg-white rounded-2xl shadow-xl border border-gray-200 mb-10 text-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Sidebar -->
+                    <aside class="lg:col-span-1 space-y-8 sticky top-28 h-screen">
+                        ${renderUserCard()}
+                        ${renderPostForm()}
+                    </aside>
+                    
+                    <!-- Main Content Feed -->
+                    <div class="lg:col-span-2">
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 flex items-center">
+                            <span class="w-7 h-7 mr-3 text-blue-600 dark:text-blue-400">${ICONS.MessageSquare}</span>
+                            Content Feed
+                        </h2>
+                        <div class="space-y-6">
+                            ${postsListHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderAdminPanel() {
+            if (!can('admin', 'manage_roles')) {
+                // This message will be overridden by the global message, but good to have
+                generalMessage = `❌ You do not have permission to access the Admin Panel.`;
+                setCurrentView('dashboard'); // Redirect to dashboard
+                return renderDashboard(); // Render dashboard immediately
+            }
+            
+            // Placeholder content for the Admin Panel
+            return `
+                <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span class="w-9 h-9 mr-3 text-red-600 dark:text-red-400">${ICONS.ShieldCheck}</span>
+                    Admin Panel
+                </h1>
+                <div class="p-8 bg-white rounded-2xl shadow-xl border border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-all duration-300 ease-in-out">
+                    <h2 class="text-2xl font-bold mb-4">User Management</h2>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        User management and role assignment features would be built here.
+                        You have <strong>ADMIN</strong> permissions to manage this area.
+                    </p>
+                    <!-- TODO: Add user list, role change forms, etc. -->
+                    <div class="mt-6 p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            <strong>Future Development:</strong><br>
+                            A list of all users would appear here, with options to change their role (ADMIN, EDITOR, VIEWER) or delete them.
+                            This is protected by the <code>admin:manage_roles</code> permission.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPostForm() {
+            if (!user || !can('posts', 'create')) return `
+                <div class="p-6 bg-blue-50 rounded-2xl shadow-lg border border-blue-200 text-blue-700 dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-300 transition-all duration-300 ease-in-out">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6">${ICONS.Info}</span>
+                        <h3 class="text-lg font-bold">Content Creation</h3>
+                    </div>
+                    <p class="mt-2 text-sm">Your role (<strong>${user.role}</strong>) does not have permission to create new posts. You can only view content.</p>
+                </div>
+            `;
+
+            return `
+                <div class="p-6 bg-white rounded-2xl shadow-xl border border-gray-200 text-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 transition-all duration-300 ease-in-out">
                     <h3 class="text-2xl font-bold mb-5 text-blue-700 dark:text-blue-400 flex items-center">
                         <span class='w-5 h-5 mr-2'>${ICONS.Plus}</span> Publish New Content
                     </h3>
@@ -349,16 +660,16 @@
                         <input id="postTitle" type="text" placeholder="Content Title" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         />
-                        <textarea id="postContent" placeholder="Content Body (Row-level ownership will be applied here)" rows="4" required
+                        <textarea id="postContent" placeholder="Content Body..." rows="4" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         ></textarea>
                         <button type="submit" id="createPostButton"
-                            class="w-full py-3 px-4 bg-green-600 text-white font-bold rounded-xl shadow-md hover:bg-green-700 transition duration-150"
+                            class="w-full flex justify-center items-center py-3 px-4 bg-green-600 text-white font-bold rounded-xl shadow-md hover:bg-green-700 transition-all duration-150 shadow-green-200 dark:shadow-green-800/50 active:scale-[0.98] active:bg-green-800"
                         >
+                            <span class='w-5 h-5 mr-2'>${ICONS.Plus}</span>
                             Publish Post
                         </button>
                     </form>
-                    ${generalMessage && generalMessage.startsWith('✅ Post') ? `<p class="mt-4 text-sm font-medium p-3 rounded-lg bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">${generalMessage}</p>` : ''}
                 </div>
             `;
         }
@@ -388,14 +699,17 @@
 
                 generalMessage = `✅ Post "${data.title}" created successfully!`;
                 document.getElementById('postForm').reset();
-                await fetchPosts();
+                await fetchPosts(); // This will re-render
 
             } catch (err) {
                 generalMessage = `❌ Error: ${err.message}`;
-            } finally {
-                button.disabled = false;
-                button.innerHTML = 'Publish Post';
                 renderApp(); // Rerender to show message
+            } finally {
+                // Button will be re-rendered, but if it still exists (on error)
+                if(document.getElementById('createPostButton')) {
+                    button.disabled = false;
+                    button.innerHTML = `<span class='w-5 h-5 mr-2'>${ICONS.Plus}</span> Publish Post`;
+                }
             }
         }
 
@@ -411,7 +725,7 @@
                 <div class="flex space-x-2 shrink-0">
                     ${canUpdate ? `
                         <button onclick="handleEditStart('${post.id}')"
-                            class="flex items-center p-2 rounded-lg text-sm font-medium transition duration-150 shadow-md bg-yellow-500 text-white hover:bg-yellow-600"
+                            class="flex items-center p-2 rounded-lg text-sm font-medium transition-all duration-150 shadow-md bg-yellow-500 text-white hover:bg-yellow-600 active:scale-95 active:bg-yellow-700"
                             title="Edit Content"
                         >
                             <span class='w-4 h-4 mr-1'>${ICONS.Edit}</span> Edit
@@ -426,7 +740,7 @@
                     `}
                     ${canDelete ? `
                         <button onclick="handlePostDelete('${post.id}')"
-                            class="flex items-center p-2 rounded-lg text-sm font-medium transition duration-150 shadow-md bg-red-600 text-white hover:bg-red-700"
+                            class="flex items-center p-2 rounded-lg text-sm font-medium transition-all duration-150 shadow-md bg-red-600 text-white hover:bg-red-700 active:scale-95 active:bg-red-800"
                             title="Delete Content"
                         >
                             <span class='w-4 h-4 mr-1'>${ICONS.Trash2}</span> Delete
@@ -443,8 +757,8 @@
             ` : '';
 
             return `
-                <div id="post-${post.id}" class="p-6 rounded-2xl shadow-lg transition-shadow border text-gray-800 ${isOwner ? 'bg-indigo-50 border-indigo-200 hover:shadow-xl dark:bg-indigo-900/50 dark:border-indigo-700' : 'bg-white border-gray-200 hover:shadow-lg dark:bg-gray-800 dark:border-gray-700'}">
-                    <div class='flex justify-between items-start'>
+                <div id="post-${post.id}" class="p-6 rounded-2xl shadow-lg transition-all duration-300 ease-in-out border text-gray-800 ${isOwner ? 'bg-indigo-50 border-indigo-200 hover:shadow-xl dark:bg-indigo-900/50 dark:border-indigo-700' : 'bg-white border-gray-200 hover:shadow-lg dark:bg-gray-800 dark:border-gray-700'}">
+                    <div class='flex justify-between items-start gap-4'>
                         <div class='flex-1 pr-4'>
                             <h4 class="text-2xl font-extrabold text-gray-900 dark:text-white">${post.title}</h4>
                         </div>
@@ -457,8 +771,10 @@
                         <span class="px-3 py-1 text-xs font-semibold rounded-full border ${isOwner ? 'bg-indigo-200 text-indigo-700 border-indigo-300 dark:bg-indigo-800 dark:text-indigo-200 dark:border-indigo-600' : 'bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}">
                             ${isOwner ? 'YOUR CONTENT' : 'External Content'}
                         </span>
-                        <span>
-                            Author: <span class="font-medium text-gray-700 dark:text-gray-200">${post.author}</span> (ID: ${post.authorId})
+                        <span class="flex items-center">
+                            <span class="w-4 h-4 mr-1.5 text-gray-400">${ICONS.User}</span>
+                            Author: <span class="font-medium text-gray-700 dark:text-gray-200 ml-1">${post.author}</span> 
+                            <span class="ml-1">(ID: ${post.authorId})</span>
                         </span>
                     </div>
                 </div>
@@ -467,7 +783,7 @@
 
         async function handlePostDelete(postId) {
             // Replaced confirm() with a simple true for non-interactive environments
-            if (!(true)) return; // Was: if (!confirm(`...`))
+            if (!(true)) return; 
 
             try {
                 const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
@@ -499,20 +815,20 @@
             postElement.innerHTML = `
                 <form id="editForm-${postId}" onsubmit="handlePostUpdate(event, '${postId}')" class="space-y-4">
                     <input id="editTitle-${postId}" type="text" value="${post.title.replace(/"/g, '&quot;')}" required
-                        class="w-full text-2xl font-bold p-2 border border-indigo-400 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:bg-gray-700 dark:text-white dark:border-indigo-600"
+                        class="w-full text-2xl font-bold p-2 border border-indigo-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:shadow-lg text-gray-900 dark:bg-gray-700 dark:text-white dark:border-indigo-600 transition-all duration-200 ease-in-out"
                     />
                     <textarea id="editContent-${postId}" rows="4" required
-                        class="w-full p-2 border border-indigo-300 rounded-lg text-gray-700 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                        class="w-full p-2 border border-indigo-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:shadow-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 transition-all duration-200 ease-in-out"
                     >${post.content}</textarea>
 
                     <div class="flex justify-end space-x-2 border-t pt-4 border-gray-100 dark:border-gray-700">
                         <button type="submit" id="saveButton-${postId}"
-                            class="flex items-center p-2 rounded-lg text-sm font-medium transition duration-150 shadow-md bg-indigo-600 text-white hover:bg-indigo-700"
+                            class="flex items-center p-2 rounded-lg text-sm font-medium transition-all duration-1Gas0 shadow-md bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 active:bg-indigo-800"
                         >
                             <span class='w-4 h-4 mr-1'>${ICONS.Shield}</span> Save Changes
                         </button>
                         <button type="button" onclick="fetchPosts()"
-                            class="flex items-center p-2 rounded-lg text-sm font-medium transition duration-150 shadow-md bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                            class="flex items-center p-2 rounded-lg text-sm font-medium transition-all duration-150 shadow-md bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 active:scale-95 active:bg-gray-400 dark:active:bg-gray-500"
                         >
                             Cancel
                         </button>
@@ -548,25 +864,25 @@
                     throw new Error(data.error || 'Update Failed');
                 }
                 generalMessage = `✅ Post ${postId} updated successfully.`;
-                await fetchPosts();
+                await fetchPosts(); // This will re-render the app
             } catch (error) {
                 messageElement.textContent = `❌ Error: ${error.message}`;
-            } finally {
-                // The card will be re-rendered, so no need to re-enable the button
-                // But if the update failed, we need to re-render to show the main post card again
-                if (messageElement.textContent) {
-                    // Manually re-enable button if error occurred and we didn't re-fetch
-                    button.disabled = false;
-                    button.innerHTML = `<span class='w-4 h-4 mr-1'>${ICONS.Shield}</span> Save Changes`;
-                } else {
-                    renderApp(); // Re-render on success
-                }
+                // Manually re-enable button if error occurred
+                button.disabled = false;
+                button.innerHTML = `<span class='w-4 h-4 mr-1'>${ICONS.Shield}</span> Save Changes`;
             }
         }
 
         async function fetchPosts() {
+            if (!can('posts', 'read')) {
+                isLoading = false;
+                posts = [];
+                renderApp();
+                return;
+            }
+            
             isLoading = true;
-            renderApp();
+            renderApp(); // Show loading state in dashboard
             generalMessage = '';
 
             try {
@@ -591,283 +907,38 @@
             }
         }
 
-        function renderDashboard() {
-            let postsListHtml = '';
-            if (!can('posts', 'read')) {
-                postsListHtml = `
-                    <div class="text-red-700 p-6 bg-red-100 rounded-xl border border-red-300 shadow-md dark:bg-red-900/50 dark:text-red-300 dark:border-red-700">
-                        <p class='font-bold text-lg'>READ Permission Denied</p>
-                        <p>Your role (${user.role}) is not authorized to retrieve content from the API (posts:read is missing).</p>
-                    </div>
-                `;
-            } else if (isLoading) {
-                 postsListHtml = `
-                    <div class="flex justify-center items-center h-full min-h-[40vh] text-gray-800">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-t-4 border-indigo-500"></div>
-                    </div>
-                 `;
-            } else if (generalMessage.startsWith('❌ Error')) {
-                 postsListHtml = `
-                    <div class="text-red-700 p-6 bg-red-100 rounded-xl border border-red-300 shadow-md dark:bg-red-900/50 dark:text-red-300 dark:border-red-700">
-                        <p class='font-bold text-lg'>Access/Loading Error</p>
-                        <p>Error: <strong>${generalMessage.substring(9)}</strong>. Check server status or confirm your role has permissions.</p>
-                    </div>
-                `;
-            } else if (posts.length === 0) {
-                postsListHtml = `<p class='text-gray-500 p-4 bg-white rounded-lg border border-gray-100 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400'>No posts found.</p>`;
-            } else {
-                postsListHtml = `<div class="space-y-6">${posts.map(renderPostItem).join('')}</div>`;
-            }
-
-            const refreshButton = can('posts', 'read') ? `
-                <button onclick="fetchPosts()" class="py-2 px-4 ml-4 bg-blue-500 text-white font-medium rounded-xl shadow-md hover:bg-blue-600 transition">
-                    <span class='w-4 h-4 inline-block align-middle'>${ICONS.Refresh}</span> Refresh
-                </button>
-            ` : '';
-
-            const contentHtml = `
-                <div class="py-8 text-gray-800 dark:text-gray-200">
-                    <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-8 flex items-center">
-                        <span class='w-7 h-7 mr-3 text-blue-600 dark:text-blue-400'>${ICONS.Shield}</span> Content Dashboard
-                    </h2>
-
-                    ${renderPostForm()}
-
-                    <div class="flex justify-between items-center border-b pb-2 border-gray-200 dark:border-gray-700 mb-5">
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                            Available Posts (${posts.length})
-                        </h3>
-                        ${refreshButton}
-                    </div>
-
-                    ${postsListHtml}
-                </div>
-            `;
-            document.getElementById('main-content').innerHTML = contentHtml;
-        }
-
-        // --- Admin Panel Logic ---
-
-        let adminUsers = [];
-        let adminMessage = '';
-        let adminLoading = false;
-
-        async function fetchUsers() {
-            adminLoading = true;
-            renderApp();
-            adminMessage = '';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/admin/users`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${user.token}` },
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Failed to fetch users.');
-
-                adminUsers = data;
-            } catch (err) {
-                adminMessage = `❌ Error fetching users: ${err.message}`;
-                adminUsers = [];
-            } finally {
-                adminLoading = false;
-                renderApp();
-            }
-        }
-
-        async function handleRoleChange(userId, selectElement) {
-            const newRole = selectElement.value;
-            // Replaced confirm()
-            if (!(true)) {
-                // Reset select box if user cancels
-                selectElement.value = adminUsers.find(u => u.id === userId)?.role || newRole;
-                return;
-            }
-
-            selectElement.disabled = true;
-            adminMessage = '';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${user.token}`
-                    },
-                    body: JSON.stringify({ newRole }),
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Role update failed.');
-
-                adminMessage = `✅ ${data.message}`;
-                await fetchUsers(); // Re-fetch to update state
-            } catch (err) {
-                adminMessage = `❌ Error updating role: ${err.message}`;
-                selectElement.disabled = false;
-                renderApp();
-            }
-        }
-
-        function renderAdminPanel() {
-            let contentHtml;
-
-            if (!can('users', 'read')) {
-                contentHtml = `
-                    <div class="text-red-700 p-8 mt-8 bg-red-100 rounded-xl shadow-lg border border-red-300 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700">
-                        <h2 class='text-3xl font-bold flex items-center'>
-                            <span class='w-6 h-6 mr-3'>${ICONS.Shield}</span> Unauthorized Access
-                        </h2>
-                        <p class='mt-3'>Your role (${user.role}) is not authorized to access user information in the Admin Panel.</p>
-                    </div>
-                `;
-            } else if (adminLoading) {
-                 contentHtml = `
-                    <div class="flex justify-center items-center h-full min-h-[40vh] text-gray-800">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-t-4 border-indigo-500"></div>
-                    </div>
-                 `;
-            } else {
-                const canManageRoles = can('admin', 'manage_roles');
-
-                const usersListHtml = adminUsers.map((u) => {
-                    const selectHtml = canManageRoles && u.id !== user.userId ? `
-                        <div class='flex items-center space-x-2'>
-                            <select onchange="handleRoleChange('${u.id}', this)"
-                                class="p-3 border border-gray-300 rounded-xl text-md font-medium bg-gray-50 shadow-sm text-gray-800 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                            >
-                                <option value="ADMIN" ${u.role === 'ADMIN' ? 'selected' : ''}>ADMIN</option>
-                                <option value="EDITOR" ${u.role === 'EDITOR' ? 'selected' : ''}>EDITOR</option>
-                                <option value="VIEWER" ${u.role === 'VIEWER' ? 'selected' : ''}>VIEWER</option>
-                            </select>
-                            <span class="text-sm text-gray-500 italic dark:text-gray-400">Change Role</span>
-                        </div>
-                    ` : `
-                        <span class="py-1 px-3 text-xs font-semibold rounded-full border ${u.id === user.userId ? 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-700' : 'bg-gray-200 text-gray-600 border-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}">
-                            ${u.id === user.userId ? 'You Are Here' : canManageRoles ? 'Access Denied by Auth Check' : 'No Permission'}
-                        </span>
-                    `;
-
-                    return `
-                        <div class="p-5 rounded-xl shadow flex justify-between items-center transition-shadow border ${u.id === user.userId ? 'bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' : 'bg-white border-gray-200 hover:shadow-lg dark:bg-gray-800 dark:border-gray-700'}">
-                            <div>
-                                <p class="font-bold text-gray-900 text-lg dark:text-white">${u.username}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">ID: ${u.id} | Email: ${u.email}</p>
-                                <span class="mt-1 inline-block px-3 py-1 text-xs font-semibold rounded-full border ${ROLE_COLORS[u.role]}">
-                                    Current Role: ${u.role}
-                                </span>
-                            </div>
-                            ${selectHtml}
-                        </div>
-                    `;
-                }).join('');
-
-                contentHtml = `
-                    <div class="py-8 text-gray-800 dark:text-gray-200">
-                        <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-8 flex items-center">
-                            <span class='w-7 h-7 mr-3 text-blue-600 dark:text-blue-400'>${ICONS.Users}</span> User Management
-                        </h2>
-
-                        ${adminMessage ? `<div class="p-4 mb-6 rounded-xl text-sm font-medium ${adminMessage.startsWith('❌ Error') ? 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700' : 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700'}">${adminMessage}</div>` : ''}
-
-                        <div class="space-y-4">
-                            ${usersListHtml}
-                        </div>
-
-                        ${!canManageRoles ? `
-                            <div class='mt-6 p-4 bg-yellow-50 text-yellow-700 rounded-xl border border-yellow-300 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700'>
-                                <p class='font-bold'>Permission Detail:</p>
-                                <p class='text-sm'>You can view users, but you are blocked from managing roles (\`admin:manage_roles\` is missing).</p>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-
-            document.getElementById('main-content').innerHTML = contentHtml;
-        }
-
-        // --- Main App Flow ---
-
-        function renderApp() {
-            if (isLoading && !user) { // Only show full-page spinner if loading before login
-                renderSpinner();
-                return;
-            }
-
-            let mainContent = '';
-            if (!user) {
-                // If not logged in, always show the auth view
-                mainContent = `<div id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16"></div>`;
-                APP_ROOT.innerHTML = renderHeader() + mainContent;
-                renderAuthView();
-                return;
-            }
-
-            // Render main layout
-            mainContent = `
-                <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-                    ${renderUserCard()}
-                    <div id="main-content"></div>
-                </main>
-            `;
-            APP_ROOT.innerHTML = renderHeader() + mainContent;
-
-            // Render current view
-            switch (currentView) {
-                case 'admin':
-                    renderAdminPanel();
-                    break;
-                case 'dashboard':
-                default:
-                    renderDashboard();
-                    break;
-            }
-        }
-
-        function setCurrentView(viewName, isRegister = false) {
-            currentView = viewName;
-            generalMessage = ''; // Clear general status on view change
-            if (viewName === 'admin' && user && can('users', 'read') && !adminUsers.length) {
-                fetchUsers();
-            }
-            if (viewName === 'dashboard' && user && can('posts', 'read') && !posts.length && !isLoading) {
-                fetchPosts();
-            }
-            if (viewName === 'auth') {
-                 // Special handling for auth view transition
-                document.getElementById('main-content').innerHTML = ''; // Clear main content
-                renderAuthView(isRegister);
-                return;
-            }
-            renderApp();
-        }
-
-        // Make functions globally accessible for inline event handlers
-        window.logout = logout;
-        window.handleAuthSubmit = handleAuthSubmit;
+        // --- App Initialization ---
+        
+        // Expose functions to global scope for onclick handlers
         window.setCurrentView = setCurrentView;
-        window.fetchPosts = fetchPosts;
+        window.logout = logout;
+        window.toggleTheme = toggleTheme;
+        window.handleAuthSubmit = handleAuthSubmit;
         window.handlePostCreate = handlePostCreate;
-        window.handlePostDelete = handlePostDelete;
         window.handleEditStart = handleEditStart;
         window.handlePostUpdate = handlePostUpdate;
-        window.handleRoleChange = handleRoleChange;
-        window.toggleTheme = toggleTheme; // Expose the new theme function
+        window.handlePostDelete = handlePostDelete;
+        window.clearGeneralMessage = clearGeneralMessage;
+        window.fetchPosts = fetchPosts; // Allow cancelling edit to re-fetch
 
-        // --- Initialization ---
+        /** Initialize the application */
         function initApp() {
-            loadTheme(); // Load theme preference first
+            loadTheme();
             loadUser();
-            renderApp();
-            // Start fetching data immediately if logged in and allowed
-            if (user && can('posts', 'read') && currentView === 'dashboard') {
-                fetchPosts();
+            
+            if (user) {
+                currentView = 'dashboard';
+                fetchPosts(); // This will call renderApp() when done
+            } else {
+                currentView = 'auth';
+                isLoading = false;
+                renderApp();
             }
         }
 
-        document.addEventListener('DOMContentLoaded', initApp);
+        // Start the app
+        initApp();
+
     </script>
 </body>
 </html>
